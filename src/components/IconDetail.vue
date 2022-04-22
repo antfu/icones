@@ -4,6 +4,7 @@ import { getIconSnippet, toComponentName } from '../utils/icons'
 import { collections } from '../data'
 import { copyPreviewColor, getTransformedId, inBag, preferredCase, previewColor, selectingMode, showCaseSelect, showHelp, toggleBag } from '../store'
 import { Download } from '../utils/pack'
+import copyImage from '../utils/copyImage'
 import { idCases } from '../utils/case'
 
 const emit = defineEmits(['close'])
@@ -37,6 +38,25 @@ const copy = async(type: string) => {
   setTimeout(() => {
     copied.value = false
   }, 2000)
+}
+
+const copyPng = async() => {
+  const svgString = await getIconSnippet(props.icon, 'svg', true, color.value)
+  if (!svgString)
+    return
+  copyImage(
+    svgString,
+    color.value,
+  ).then(
+    (...a) => {
+      copied.value = true
+      setTimeout(() => (copied.value = false), 2000)
+    },
+    (...a) => {
+      copied.value = true
+      setTimeout(() => (copied.value = false), 2000)
+    },
+  )
 }
 
 const download = async(type: string) => {
@@ -169,6 +189,9 @@ const collection = computed(() => {
           </div>
           <button class="btn small mr-1 mb-1 opacity-75" @click="copy('svg')">
             SVG
+          </button>
+          <button class="btn small mr-1 mb-1 opacity-75" @click="copyPng()">
+            PNG
           </button>
           <button class="btn small mr-1 mb-1 opacity-75" @click="copy('svg-symbol')">
             SVG Symbol
